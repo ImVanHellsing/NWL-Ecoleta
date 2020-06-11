@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Desafio</title>
+	</head>
+	<body>
+		<div id="root">
+			<input type="text" name="user" id="input" />
+			<button id="btn">Add</button>
+		</div>
+
+		<script>
+			var ajax = new XMLHttpRequest();
+			var ul = document.createElement('ul');
+			const btn = document.getElementById('btn');
+			const input = document.getElementById('input');
+			const app = document.getElementById('root');
+
+			btn.addEventListener('click', function () {
+				const user = input.value;
+				ul.innerHTML = '';
+				app.appendChild(ul);
+				input.innerHTML = '';
+
+				ajax.open('GET', `https://api.github.com/users/${user}/repos`);
+				ajax.send(null);
+
+				ajax.onprogress = function () {
+					console.log('Loading...');
+				};
+
+				ajax.onreadystatechange = function () {
+					if (ajax.readyState === 4) {
+						if (ajax.status === 200) {
+							const repos = JSON.parse(ajax.responseText);
+							for (const iterator of repos) {
+								const li = document.createElement('li');
+								const text = document.createTextNode(iterator.name);
+								li.appendChild(text);
+								ul.appendChild(li);
+							}
+						} else {
+							console.log('404 - Erro na requisação');
+						}
+					}
+				};
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head> </head>
+	<body>
+		<div id="app" style="background-color: black;">
+			<input type="text" name="nome" id="nome" />
+			<button id="btn">Adicionar</button>
+		</div>
+
+		<script>
+			const nomes = ['Diego', 'Gabriel', 'Lucas'];
+
+			const ol = document.createElement('ol');
+			const btn = document.getElementById('btn');
+			const container = document.getElementById('app');
+			const input = document.getElementById('nome');
+
+			for (const iterator of nomes) {
+				const li = document.createElement('li');
+				const text = document.createTextNode(iterator);
+				li.appendChild(text);
+				li.style.color = 'white';
+				ol.appendChild(li);
+			}
+
+			container.appendChild(ol);
+
+			btn.addEventListener('click', function () {
+				const li = document.createElement('li');
+				const text = document.createTextNode(input.value);
+				li.appendChild(text);
+				li.style.color = 'white';
+				ol.appendChild(li);
+				input.value = '';
+			});
+		</script>
+	</body>
+</html>
