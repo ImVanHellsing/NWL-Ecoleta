@@ -21,8 +21,7 @@ class PointsController {
 
 		//Armazena os dados enviados no banco de dados via knex e recebe o ID recém criado
 		const point = {
-			image:
-				'https://images.unsplash.com/photo-1573481078935-b9605167e06b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60',
+			image: request.file.filename,
 			name,
 			email,
 			whatsapp,
@@ -36,12 +35,15 @@ class PointsController {
 
 		//Relacionamento com a tabela pivot usando o ID retornado pelo POST
 		const point_id = insertedIds[0];
-		const pointItems = items.map((item_id: number) => {
-			return {
-				item_id,
-				point_id,
-			};
-		});
+		const pointItems = items
+			.split(',')
+			.map((item: string) => Number(item.trim()))
+			.map((item_id: number) => {
+				return {
+					item_id,
+					point_id,
+				};
+			});
 
 		await trx('point_items').insert(pointItems);
 
@@ -68,11 +70,18 @@ class PointsController {
 			.distinct()
 			.select('points.*');
 
+		const serializedPoints = points.map((point) => {
+			return {
+				...point,
+				image_url: `http://192.168.0.11:3333/uploads/${point.image}`,
+			};
+		});
+
 		if (!points || points.length == 0) {
 			console.log(points);
 			return response.status(404).json('Filtred Points not found.');
 		}
-		return response.status(302).json(points);
+		return response.status(302).json(serializedPoints);
 	}
 
 	async show(request: Request, response: Response) {
@@ -89,7 +98,12 @@ class PointsController {
 			.where('point_items.point_id', point_id)
 			.select('items.title');
 
-		return response.status(302).json({ point, items });
+		const serializedPoint = {
+			...point,
+			image_url: `http://192.168.0.11:3333/uploads/${point.image}`,
+		};
+
+		return response.status(302).json({ point: serializedPoint, items });
 	}
 }
 
